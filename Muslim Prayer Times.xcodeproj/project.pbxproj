@@ -6,14 +6,66 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		44DA395B2F93945100FE968A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44DA395A2F93945100FE968A /* WidgetKit.framework */; };
+		44DA395D2F93945100FE968A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44DA395C2F93945100FE968A /* SwiftUI.framework */; };
+		44DA396C2F93945300FE968A /* PrayerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 44DA39582F93945100FE968A /* PrayerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		44DA396A2F93945300FE968A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 44DA39132F935FF300FE968A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 44DA39572F93945100FE968A;
+			remoteInfo = PrayerWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		44DA39712F93945300FE968A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				44DA396C2F93945300FE968A /* PrayerWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		44DA391B2F935FF300FE968A /* Muslim Prayer Times.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Muslim Prayer Times.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		44DA39582F93945100FE968A /* PrayerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PrayerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		44DA395A2F93945100FE968A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		44DA395C2F93945100FE968A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		44DA39732F93957900FE968A /* PrayerWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrayerWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		44DA396D2F93945300FE968A /* Exceptions for "PrayerWidget" folder in "PrayerWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 44DA39572F93945100FE968A /* PrayerWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		44DA391D2F935FF300FE968A /* Muslim Prayer Times */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Muslim Prayer Times";
+			sourceTree = "<group>";
+		};
+		44DA395E2F93945100FE968A /* PrayerWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				44DA396D2F93945300FE968A /* Exceptions for "PrayerWidget" folder in "PrayerWidgetExtension" target */,
+			);
+			path = PrayerWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +78,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		44DA39552F93945100FE968A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44DA395D2F93945100FE968A /* SwiftUI.framework in Frameworks */,
+				44DA395B2F93945100FE968A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		44DA39122F935FF300FE968A = {
 			isa = PBXGroup;
 			children = (
+				44DA39732F93957900FE968A /* PrayerWidgetExtension.entitlements */,
 				44DA391D2F935FF300FE968A /* Muslim Prayer Times */,
+				44DA395E2F93945100FE968A /* PrayerWidget */,
+				44DA39592F93945100FE968A /* Frameworks */,
 				44DA391C2F935FF300FE968A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +105,18 @@
 			isa = PBXGroup;
 			children = (
 				44DA391B2F935FF300FE968A /* Muslim Prayer Times.app */,
+				44DA39582F93945100FE968A /* PrayerWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		44DA39592F93945100FE968A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				44DA395A2F93945100FE968A /* WidgetKit.framework */,
+				44DA395C2F93945100FE968A /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +129,12 @@
 				44DA39172F935FF300FE968A /* Sources */,
 				44DA39182F935FF300FE968A /* Frameworks */,
 				44DA39192F935FF300FE968A /* Resources */,
+				44DA39712F93945300FE968A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				44DA396B2F93945300FE968A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				44DA391D2F935FF300FE968A /* Muslim Prayer Times */,
@@ -69,6 +145,28 @@
 			productName = "Muslim Prayer Times";
 			productReference = 44DA391B2F935FF300FE968A /* Muslim Prayer Times.app */;
 			productType = "com.apple.product-type.application";
+		};
+		44DA39572F93945100FE968A /* PrayerWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 44DA396E2F93945300FE968A /* Build configuration list for PBXNativeTarget "PrayerWidgetExtension" */;
+			buildPhases = (
+				44DA39542F93945100FE968A /* Sources */,
+				44DA39552F93945100FE968A /* Frameworks */,
+				44DA39562F93945100FE968A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				44DA395E2F93945100FE968A /* PrayerWidget */,
+			);
+			name = PrayerWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PrayerWidgetExtension;
+			productReference = 44DA39582F93945100FE968A /* PrayerWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +179,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					44DA391A2F935FF300FE968A = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					44DA39572F93945100FE968A = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -100,12 +201,20 @@
 			projectRoot = "";
 			targets = (
 				44DA391A2F935FF300FE968A /* Muslim Prayer Times */,
+				44DA39572F93945100FE968A /* PrayerWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		44DA39192F935FF300FE968A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44DA39562F93945100FE968A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +231,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		44DA39542F93945100FE968A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		44DA396B2F93945300FE968A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 44DA39572F93945100FE968A /* PrayerWidgetExtension */;
+			targetProxy = 44DA396A2F93945300FE968A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		44DA39242F935FF400FE968A /* Debug */ = {
@@ -251,6 +375,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Muslim Prayer Times/Muslim Prayer Times.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z5GXS6AYDN;
@@ -285,6 +410,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Muslim Prayer Times/Muslim Prayer Times.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z5GXS6AYDN;
@@ -314,6 +440,70 @@
 			};
 			name = Release;
 		};
+		44DA396F2F93945300FE968A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PrayerWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z5GXS6AYDN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PrayerWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PrayerWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "insaneworks.space.Muslim-Prayer-Times.PrayerWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		44DA39702F93945300FE968A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PrayerWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z5GXS6AYDN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PrayerWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PrayerWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "insaneworks.space.Muslim-Prayer-Times.PrayerWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -331,6 +521,15 @@
 			buildConfigurations = (
 				44DA39272F935FF400FE968A /* Debug */,
 				44DA39282F935FF400FE968A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		44DA396E2F93945300FE968A /* Build configuration list for PBXNativeTarget "PrayerWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				44DA396F2F93945300FE968A /* Debug */,
+				44DA39702F93945300FE968A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

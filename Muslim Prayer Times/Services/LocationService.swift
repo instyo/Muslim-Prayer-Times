@@ -28,6 +28,7 @@ enum LocationError: Error, LocalizedError {
 
 class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
+    private let appGroupID = "group.insaneworks.space.MuslimPrayerTimes"
 
     @Published var location: CLLocation?
     @Published var locationError: LocationError?
@@ -70,8 +71,15 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         location = locations.first
         if let loc = locations.first {
+            saveLocationToAppGroup(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude)
             fetchCityName(from: loc)
         }
+    }
+
+    private func saveLocationToAppGroup(lat: Double, lon: Double) {
+        guard let defaults = UserDefaults(suiteName: appGroupID) else { return }
+        let locationData: [String: Double] = ["latitude": lat, "longitude": lon]
+        defaults.set(locationData, forKey: "userLocation")
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
