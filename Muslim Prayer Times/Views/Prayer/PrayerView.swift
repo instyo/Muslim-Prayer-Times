@@ -102,14 +102,11 @@ struct PrayerView: View {
         }
         .onAppear {
             if let loc = locationService.location {
-                viewModel.startAutoRefresh(
-                    latitude: loc.coordinate.latitude,
-                    longitude: loc.coordinate.longitude
-                )
+                viewModel.startCountdownTimer()
             }
         }
         .onDisappear {
-            viewModel.stopAutoRefresh()
+            viewModel.stopCountdownTimer()
         }
     }
 }

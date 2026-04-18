@@ -19,7 +19,7 @@ class PrayerViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
-    private var refreshTimer: Timer?
+    private var timer: AnyCancellable?
 
     func fetchPrayerTimes(latitude: Double, longitude: Double, showLoading: Bool = true) async {
         isLoading = showLoading
@@ -45,18 +45,17 @@ class PrayerViewModel: ObservableObject {
         isLoading = false
     }
 
-    func startAutoRefresh(latitude: Double, longitude: Double) {
-        // Refresh setiap 1 menit untuk update countdown
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                await self?.fetchPrayerTimes(latitude: latitude, longitude: longitude, showLoading: false)
+    func startCountdownTimer() {
+        timer = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
             }
-        }
     }
 
-    func stopAutoRefresh() {
-        refreshTimer?.invalidate()
-        refreshTimer = nil
+    func stopCountdownTimer() {
+        timer?.cancel()
+        timer = nil
     }
 
     func remainingTime(for prayer: PrayerItem) -> String {
