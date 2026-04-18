@@ -1,0 +1,84 @@
+//
+//  LocationService.swift
+//  Muslim Prayer Times
+//
+//  Created by Ikhwan Setyo on 18/04/26.
+//
+
+import Foundation
+import CoreLocation
+import Combine
+
+enum LocationError: Error, LocalizedError {
+    case denied
+    case restricted
+    case unknown
+
+    var errorDescription: String? {
+        switch self {
+        case .denied:
+            return "Location access denied. Please enable it in Settings to get accurate prayer times."
+        case .restricted:
+            return "Location access is restricted on this device."
+        case .unknown:
+            return "Unable to determine your location."
+        }
+    }
+}
+
+class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+
+    @Published var location: CLLocation?
+    @Published var locationError: LocationError?
+    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var cityName: String = ""
+
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+
+    func requestLocation() {
+        manager.requestWhenInUseAuthorization()
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        authorizationStatus = manager.authorizationStatus
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationError = nil
+            manager.requestLocation()
+        case .denied:
+            locationError = .denied
+        case .restricted:
+            locationError = .restricted
+        default:
+            break
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        location = locations.first
+        if let loc = locations.first {
+            fetchCityName(from: loc)
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        locationError = .unknown
+    }
+
+    private func fetchCityName(from location: CLLocation) {
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
+            if let city = placemarks?.first?.locality,
+               let country = placemarks?.first?.country {
+                DispatchQueue.main.async {
+                    self?.cityName = "\(city), \(country)"
+                }
+            }
+        }
+    }
+}
