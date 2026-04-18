@@ -133,7 +133,10 @@ struct QiblaView: View {
                 )
             }
         }
-        .onAppear { viewModel.startCompass() }
+        .onAppear {
+            viewModel.setLocationService(locationService)
+            viewModel.startCompass()
+        }
         .onDisappear { viewModel.stopCompass() }
     }
 
@@ -242,7 +245,7 @@ struct CompassView: View {
                     .frame(width: 5, height: 5)
             }
 
-            // Mosque icon at top (North indicator / Qibla marker)
+            // Mosque icon — rotates to show Qibla direction
             VStack {
                 ZStack {
                     Circle()
@@ -250,13 +253,16 @@ struct CompassView: View {
                         .frame(width: 52, height: 52)
                         .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
 
-                    Image(systemName: "building.columns.fill")
-                        .font(.system(size: 22))
-                        .foregroundColor(Color("PrimaryGreen"))
+                    Image("kaaba")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
                 }
                 Spacer()
             }
             .frame(height: 300)
+            .rotationEffect(.degrees(qiblaAngle))
+            .animation(.easeInOut(duration: 0.15), value: qiblaAngle)
         }
         .frame(width: 300, height: 300)
     }

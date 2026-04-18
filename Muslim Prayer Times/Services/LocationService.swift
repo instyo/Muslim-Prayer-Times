@@ -33,6 +33,7 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var locationError: LocationError?
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var cityName: String = ""
+    @Published var heading: Double = 0
 
     override init() {
         super.init()
@@ -50,12 +51,19 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
         case .authorizedWhenInUse, .authorizedAlways:
             locationError = nil
             manager.requestLocation()
+            manager.startUpdatingHeading()
         case .denied:
             locationError = .denied
         case .restricted:
             locationError = .restricted
         default:
             break
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        if newHeading.headingAccuracy >= 0 {
+            heading = newHeading.magneticHeading
         }
     }
 

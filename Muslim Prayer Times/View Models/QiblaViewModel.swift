@@ -9,17 +9,16 @@
 import Foundation
 import CoreLocation
 import Combine
-import CoreMotion
 
 @MainActor
 class QiblaViewModel: ObservableObject {
     @Published var qiblaDirection: Double = 0
     @Published var distanceKm: Double = 0
-    @Published var compassHeading: Double = 0
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
-    private let motionManager = CMMotionManager()
+    private var cancellables = Set<AnyCancellable>()
+    weak var locationService: LocationService?
 
     func loadQiblaData(latitude: Double, longitude: Double) async {
         isLoading = true
@@ -39,25 +38,26 @@ class QiblaViewModel: ObservableObject {
         isLoading = false
     }
 
+    func setLocationService(_ service: LocationService) {
+        self.locationService = service
+    }
+
     func startCompass() {
-        guard motionManager.isDeviceMotionAvailable else { return }
-        motionManager.deviceMotionUpdateInterval = 0.05
-        motionManager.startDeviceMotionUpdates(using: .xMagneticNorthZVertical, to: .main) { [weak self] motion, _ in
-            guard let motion = motion else { return }
-            // Heading dari device dalam derajat
-            let heading = -motion.attitude.yaw * (180 / .pi)
-            DispatchQueue.main.async {
-                self?.compassHeading = heading
+        guard let service = locationService else { return }
+        service.$heading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
             }
-        }
+            .store(in: &cancellables)
     }
 
     func stopCompass() {
-        motionManager.stopDeviceMotionUpdates()
+        cancellables.removeAll()
     }
 
-    // Sudut jarum qibla relatif terhadap orientasi device
     var qiblaRotationAngle: Double {
-        return qiblaDirection + compassHeading
+        guard let service = locationService else { return qiblaDirection }
+        return qiblaDirection - service.heading
     }
 }
