@@ -21,6 +21,26 @@ struct PrayerView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 20) {
+                            HStack {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "location.fill")
+                                        .font(.caption)
+                                        .foregroundColor(Color("PrimaryGreen"))
+                                    Text(locationService.cityName)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                }
+                                
+                                Spacer()
+                                
+                                if !viewModel.hijriDateString.isEmpty {
+                                    Text(viewModel.hijriDateString)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .padding(.horizontal)
+                            
                             if let error = viewModel.errorMessage {
                                 ErrorView(message: error) {
                                     Task {
@@ -73,25 +93,6 @@ struct PrayerView: View {
             }
             .background(Color("Background").ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "location.fill")
-                            .font(.caption)
-                            .foregroundColor(Color("PrimaryGreen"))
-                        Text(locationService.cityName)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if !viewModel.hijriDateString.isEmpty {
-                        Text(viewModel.hijriDateString)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
         }
         .task {
             if let loc = locationService.location {
