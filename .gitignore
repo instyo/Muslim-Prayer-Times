@@ -1,0 +1,13 @@
+# Config files with sensitive API keys
+Muslim Prayer Times/Config.xcconfig
+PrayerWidget/Config.xcconfig
+
+# Xcode
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad
+
+# Git
+.git/

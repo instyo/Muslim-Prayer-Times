@@ -28,8 +28,8 @@ class PrayerAPIService {
     private init() {}
     
     func fetchPrayerData(latitude: Double, longitude: Double) async throws -> PrayerResponse {
-        // Ganti dengan actual API endpoint kamu
-        let urlString = "https://islamicapi.com/api/v1/prayer-time/?lat=\(latitude)&lon=\(longitude)&api_key=M4WpwtrRFuz9L1TXNQU3wAOqbhCvBfbgJs0OX1OYyAwcBAx0"
+        let apiKey = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String ?? ""
+        let urlString = "https://islamicapi.com/api/v1/prayer-time/?lat=\(latitude)&lon=\(longitude)&api_key=\(apiKey)"
         
         print(urlString)
         
