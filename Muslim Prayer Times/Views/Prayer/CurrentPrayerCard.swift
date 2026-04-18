@@ -11,6 +11,7 @@ struct CurrentPrayerCard: View {
     let currentPrayer: PrayerItem
     let nextPrayer: PrayerItem
     let remainingTime: String
+    let progress: Double
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -41,7 +42,7 @@ struct CurrentPrayerCard: View {
                 }
             }
 
-            // Progress bar — simplified, static untuk sekarang
+            // Progress bar
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3)
@@ -50,7 +51,7 @@ struct CurrentPrayerCard: View {
 
                     RoundedRectangle(cornerRadius: 3)
                         .fill(Color("PrimaryGreen"))
-                        .frame(width: geo.size.width * 0.55, height: 4)
+                        .frame(width: geo.size.width * progress, height: 4)
                 }
             }
             .frame(height: 4)

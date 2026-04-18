@@ -101,6 +101,20 @@ struct PrayerTimeHelper {
         }
     }
 
+    // Progress percentage: 0.0 to 1.0 for current prayer period
+    static func progressPercentage(currentTime: String, nextTime: String) -> Double {
+        guard let start = timeStringToDate(currentTime),
+              let end = timeStringToDate(nextTime) else { return 0 }
+
+        let now = Date()
+        let total = end.timeIntervalSince(start)
+
+        if total <= 0 { return 0 }
+
+        let elapsed = now.timeIntervalSince(start)
+        return min(max(elapsed / total, 0), 1)
+    }
+
     // Cari prayer berikutnya setelah ongoing
     static func nextPrayer(items: [PrayerItem]) -> PrayerItem? {
         if let ongoingIndex = items.firstIndex(where: { $0.status == .ongoing }) {

@@ -39,7 +39,8 @@ struct PrayerView: View {
                                     CurrentPrayerCard(
                                         currentPrayer: current,
                                         nextPrayer: next,
-                                        remainingTime: viewModel.remainingTime(for: next)
+                                        remainingTime: viewModel.remainingTime(for: next),
+                                        progress: viewModel.progress
                                     )
                                 }
 
