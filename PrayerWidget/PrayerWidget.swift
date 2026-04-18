@@ -35,6 +35,7 @@ struct WidgetPrayerTimes: Codable {
 struct PrayerEntry: TimelineEntry {
     let date: Date
     let prayerTimes: WidgetPrayerTimes
+    let locationName: String
 }
 
 // MARK: - Timeline Provider
@@ -44,11 +45,11 @@ struct Provider: AppIntentTimelineProvider {
     private let apiKey = "M4WpwtrRFuz9L1TXNQU3wAOqbhCvBfbgJs0OX1OYyAwcBAx0"
 
     func placeholder(in context: Context) -> PrayerEntry {
-        PrayerEntry(date: Date(), prayerTimes: placeholderPrayerTimes())
+        PrayerEntry(date: Date(), prayerTimes: placeholderPrayerTimes(), locationName: "Jakarta")
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> PrayerEntry {
-        PrayerEntry(date: Date(), prayerTimes: placeholderPrayerTimes())
+        PrayerEntry(date: Date(), prayerTimes: placeholderPrayerTimes(), locationName: "Jakarta")
     }
 
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<PrayerEntry> {
@@ -59,9 +60,11 @@ struct Provider: AppIntentTimelineProvider {
         #endif
         
         let prayerTimes: WidgetPrayerTimes
+        let locationName: String
         if let loc = location {
             do {
                 prayerTimes = try await fetchPrayerTimes(latitude: loc.latitude, longitude: loc.longitude)
+                locationName = loc.cityName.isEmpty ? "Unknown" : loc.cityName
                 #if DEBUG
                 print("Widget: Successfully fetched prayer times")
                 #endif
@@ -70,12 +73,14 @@ struct Provider: AppIntentTimelineProvider {
                 print("Widget: Failed to fetch prayer times: \(error)")
                 #endif
                 prayerTimes = placeholderPrayerTimes()
+                locationName = location?.cityName ?? "Unknown"
             }
         } else {
             #if DEBUG
             print("Widget: No location available, using placeholder")
             #endif
             prayerTimes = placeholderPrayerTimes()
+            locationName = "Unknown"
         }
 
         let currentDate = Date()
@@ -83,21 +88,22 @@ struct Provider: AppIntentTimelineProvider {
 
         for hourOffset in 0..<24 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            entries.append(PrayerEntry(date: entryDate, prayerTimes: prayerTimes))
+            entries.append(PrayerEntry(date: entryDate, prayerTimes: prayerTimes, locationName: locationName))
         }
 
-        let nextMidnight = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!)
-        return Timeline(entries: entries, policy: .after(nextMidnight))
+        let nextHour = Calendar.current.date(byAdding: .hour, value: 1, to: currentDate)!
+        return Timeline(entries: entries, policy: .after(nextHour))
     }
 
-    private func loadLocation() -> (latitude: Double, longitude: Double)? {
+    private func loadLocation() -> (latitude: Double, longitude: Double, cityName: String)? {
         guard let defaults = UserDefaults(suiteName: appGroupID),
-              let locationData = defaults.dictionary(forKey: "userLocation") as? [String: Double],
-              let lat = locationData["latitude"],
-              let lon = locationData["longitude"] else {
+              let locationData = defaults.dictionary(forKey: "userLocation"),
+              let lat = locationData["latitude"] as? Double,
+              let lon = locationData["longitude"] as? Double else {
             return nil
         }
-        return (lat, lon)
+        let cityName = locationData["cityName"] as? String ?? ""
+        return (lat, lon, cityName)
     }
 
     private func fetchPrayerTimes(latitude: Double, longitude: Double) async throws -> WidgetPrayerTimes {
@@ -196,7 +202,7 @@ struct PrayerWidgetEntryView: View {
     private let accentGreen = Color(red: 0.39, green: 0.82, blue: 0.63)
     private let bgColor = Color(red: 0.05, green: 0.11, blue: 0.16)
 
-    private var activePrayerKey: String {
+    private var currentPrayerKey: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
 
@@ -223,8 +229,23 @@ struct PrayerWidgetEntryView: View {
         return past.last?.key ?? "fajr"
     }
 
+    private var nextPrayerKey: String {
+        let currentIndex = prayers.firstIndex { $0.key == currentPrayerKey } ?? 0
+        let nextIndex = currentIndex + 1
+        guard nextIndex < prayers.count else { return prayers[0].key }
+        return prayers[nextIndex].key
+    }
+
+    private var currentPrayerName: String {
+        prayers.first { $0.key == currentPrayerKey }?.name ?? "Fajr"
+    }
+
+    private var nextPrayerName: String {
+        prayers.first { $0.key == nextPrayerKey }?.name ?? "Dhuhr"
+    }
+
     private func progressForPrayer(key: String) -> Double {
-        guard key == activePrayerKey else { return 0 }
+        guard key == currentPrayerKey else { return 0 }
 
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -254,12 +275,61 @@ struct PrayerWidgetEntryView: View {
     }
 
     var body: some View {
-        if widgetFamily == .systemSmall {
+        switch widgetFamily {
+        case .systemSmall:
             smallWidget
-        } else if widgetFamily == .systemMedium {
+        case .systemMedium:
             mediumWidget
-        } else {
+        case .accessoryRectangular:
+            accessoryRectangularWidget
+        default:
             largeWidget
+        }
+    }
+
+    private func iconForPrayer(_ key: String) -> String {
+        switch key {
+        case "fajr": return "sunrise.fill"
+        case "sunrise": return "sunrise.fill"
+        case "dhuhr": return "sun.max.fill"
+        case "asr": return "sun.min.fill"
+        case "maghrib": return "sunset.fill"
+        case "isha": return "moon.fill"
+        default: return "moon.fill"
+        }
+    }
+
+    var accessoryRectangularWidget: some View {
+        HStack(spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 4) {
+                    Image(systemName: iconForPrayer(currentPrayerKey))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 14, height: 14)
+                    Text(currentPrayerName)
+                        .font(.system(size: 12, weight: .semibold))
+                        .widgetAccentable()
+                }
+                HStack(spacing: 4) {
+                    Image(systemName: iconForPrayer(nextPrayerKey))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 14, height: 14)
+                    Text(nextPrayerName)
+                        .font(.system(size: 12))
+                }
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 8) {
+                Text(entry.prayerTimes.time(for: currentPrayerKey))
+                    .font(.system(size: 12, weight: .semibold))
+                Text(entry.prayerTimes.time(for: nextPrayerKey))
+                    .font(.system(size: 12))
+            }
+        }
+        .containerBackground(for: .widget) {
+            AccessoryWidgetBackground()
         }
     }
 
@@ -267,30 +337,44 @@ struct PrayerWidgetEntryView: View {
 
     var smallWidget: some View {
         VStack(spacing: 0) {
+            HStack {
+                Text(entry.locationName)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.white.opacity(0.38))
+                Spacer()
+                Text(entry.date.formatted(.dateTime.day().month(.abbreviated)))
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.22))
+            }
+            .padding(.bottom, 4)
+            
             ForEach(prayers, id: \.key) { prayer in
-                let isActive = prayer.key == activePrayerKey
-                HStack(spacing: 0) {
+                let isActive = prayer.key == currentPrayerKey
+                HStack(spacing: 4) {
+                    Image(systemName: iconForPrayer(prayer.key))
+                        .font(.system(size: 10))
+                        .foregroundColor(isActive ? accentGreen : .white.opacity(0.25))
+                        .frame(width: 14)
                     Text(prayer.name)
-                        .font(.system(size: 12, weight: isActive ? .medium : .regular))
+                        .font(.system(size: 11, weight: isActive ? .medium : .regular))
                         .foregroundColor(isActive ? accentGreen : .white.opacity(0.38))
-                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Spacer()
 
                     if isActive {
                         Circle()
                             .fill(accentGreen.opacity(0.8))
                             .frame(width: 4, height: 4)
-                            .padding(.trailing, 6)
                     }
 
                     Text(entry.prayerTimes.time(for: prayer.key))
-                        .font(.system(size: 12, weight: isActive ? .medium : .regular))
+                        .font(.system(size: 11, weight: isActive ? .medium : .regular))
                         .foregroundColor(isActive ? .white.opacity(0.88) : .white.opacity(0.38))
                         .monospacedDigit()
                 }
                 .padding(.vertical, 2)
             }
         }
-        .padding(8)
         .containerBackground(for: .widget) { bgColor }
     }
 
@@ -298,15 +382,30 @@ struct PrayerWidgetEntryView: View {
 
     var mediumWidget: some View {
         VStack(spacing: 0) {
+            HStack {
+                Text(entry.locationName)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.white.opacity(0.38))
+                Spacer()
+                Text(entry.date.formatted(.dateTime.day().month(.abbreviated)))
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.22))
+            }
+            .padding(.bottom, 6)
+            
             ForEach(prayers, id: \.key) { prayer in
-                let isActive = prayer.key == activePrayerKey
+                let isActive = prayer.key == currentPrayerKey
                 let progress = progressForPrayer(key: prayer.key)
 
                 HStack(spacing: 6) {
+                    Image(systemName: iconForPrayer(prayer.key))
+                        .font(.system(size: 10))
+                        .foregroundColor(isActive ? accentGreen : .white.opacity(0.25))
+                        .frame(width: 14)
                     Text(prayer.name)
-                        .font(.system(size: 12, weight: isActive ? .medium : .regular))
+                        .font(.system(size: 11, weight: isActive ? .medium : .regular))
                         .foregroundColor(isActive ? accentGreen : .white.opacity(0.38))
-                        .frame(width: 52, alignment: .leading)
+                        .frame(width: 44, alignment: .leading)
 
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
@@ -345,6 +444,12 @@ struct PrayerWidgetEntryView: View {
                     .textCase(.uppercase)
                     .kerning(0.7)
                 Spacer()
+                Text(entry.locationName)
+                    .font(.system(size: 10))
+                    .foregroundColor(.white.opacity(0.22))
+                Text("•")
+                    .font(.system(size: 10))
+                    .foregroundColor(.white.opacity(0.15))
                 Text(entry.date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)))
                     .font(.system(size: 10))
                     .foregroundColor(.white.opacity(0.22))
@@ -352,14 +457,18 @@ struct PrayerWidgetEntryView: View {
             .padding(.bottom, 10)
 
             ForEach(prayers, id: \.key) { prayer in
-                let isActive = prayer.key == activePrayerKey
+                let isActive = prayer.key == currentPrayerKey
                 let progress = progressForPrayer(key: prayer.key)
 
                 HStack(spacing: 8) {
+                    Image(systemName: iconForPrayer(prayer.key))
+                        .font(.system(size: 10))
+                        .foregroundColor(isActive ? accentGreen : .white.opacity(0.25))
+                        .frame(width: 14)
                     Text(prayer.name)
-                        .font(.system(size: 12, weight: isActive ? .medium : .regular))
+                        .font(.system(size: 11, weight: isActive ? .medium : .regular))
                         .foregroundColor(isActive ? accentGreen : .white.opacity(0.35))
-                        .frame(width: 54, alignment: .leading)
+                        .frame(width: 44, alignment: .leading)
 
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
@@ -404,6 +513,7 @@ struct PrayerWidget: Widget {
         AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
             PrayerWidgetEntryView(entry: entry)
         }
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryRectangular])
     }
 }
 
@@ -412,5 +522,11 @@ struct PrayerWidget: Widget {
 #Preview(as: .systemSmall) {
     PrayerWidget()
 } timeline: {
-    PrayerEntry(date: .now, prayerTimes: WidgetPrayerTimes(fajr: "04:30", sunrise: "05:45", dhuhr: "12:30", asr: "15:45", maghrib: "18:30", isha: "20:00"))
+    PrayerEntry(date: .now, prayerTimes: WidgetPrayerTimes(fajr: "04:30", sunrise: "05:45", dhuhr: "12:30", asr: "15:45", maghrib: "18:30", isha: "20:00"), locationName: "Jakarta")
+}
+
+#Preview(as: .accessoryRectangular) {
+    PrayerWidget()
+} timeline: {
+    PrayerEntry(date: .now, prayerTimes: WidgetPrayerTimes(fajr: "04:30", sunrise: "05:45", dhuhr: "12:30", asr: "15:45", maghrib: "18:30", isha: "20:00"), locationName: "Jakarta")
 }

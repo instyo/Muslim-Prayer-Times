@@ -78,7 +78,11 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     private func saveLocationToAppGroup(lat: Double, lon: Double) {
         guard let defaults = UserDefaults(suiteName: appGroupID) else { return }
-        let locationData: [String: Double] = ["latitude": lat, "longitude": lon]
+        let locationData: [String: Any] = [
+            "latitude": lat,
+            "longitude": lon,
+            "cityName": cityName
+        ]
         defaults.set(locationData, forKey: "userLocation")
     }
 
@@ -89,12 +93,19 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     private func fetchCityName(from location: CLLocation) {
         let geocoder = CLGeocoder()
         geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
-            if let city = placemarks?.first?.locality,
-               let country = placemarks?.first?.country {
+            if let city = placemarks?.first?.locality {
                 DispatchQueue.main.async {
-                    self?.cityName = "\(city), \(country)"
+                    self?.cityName = city
+                    self?.saveCityNameToAppGroup(city)
                 }
             }
         }
+    }
+
+    private func saveCityNameToAppGroup(_ cityName: String) {
+        guard let defaults = UserDefaults(suiteName: appGroupID),
+              var locationData = defaults.dictionary(forKey: "userLocation") as? [String: Any] else { return }
+        locationData["cityName"] = cityName
+        defaults.set(locationData, forKey: "userLocation")
     }
 }
