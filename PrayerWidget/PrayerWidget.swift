@@ -42,10 +42,7 @@ struct PrayerEntry: TimelineEntry {
 
 struct Provider: AppIntentTimelineProvider {
     private let appGroupID = "group.insaneworks.space.MuslimPrayerTimes"
-    
-    private var apiKey: String {
-        Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String ?? ""
-    }
+    private let apiKey = "M4WpwtrRFuz9L1TXNQU3wAOqbhCvBfbgJs0OX1OYyAwcBAx0"
 
     func placeholder(in context: Context) -> PrayerEntry {
         PrayerEntry(date: Date(), prayerTimes: placeholderPrayerTimes(), locationName: "Jakarta")
