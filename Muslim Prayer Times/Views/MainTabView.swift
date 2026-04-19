@@ -25,6 +25,12 @@ struct MainTabView: View {
                     Label("Qibla", systemImage: "location.north.fill")
                 }
                 .tag(1)
+
+            AboutView()
+                .tabItem {
+                    Label("About", systemImage: "info.circle.fill")
+                }
+                .tag(2)
         }
         .accentColor(Color("PrimaryGreen"))
     }
