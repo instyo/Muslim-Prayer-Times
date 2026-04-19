@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AboutView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 Color("Background").ignoresSafeArea()
 

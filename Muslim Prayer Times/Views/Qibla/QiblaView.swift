@@ -13,7 +13,7 @@ struct QiblaView: View {
     @StateObject private var viewModel = QiblaViewModel()
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 Color("Background").ignoresSafeArea()
 

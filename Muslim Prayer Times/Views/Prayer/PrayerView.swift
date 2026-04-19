@@ -13,7 +13,7 @@ struct PrayerView: View {
     @StateObject private var viewModel = PrayerViewModel()
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 if viewModel.isLoading {
                     ProgressView()
