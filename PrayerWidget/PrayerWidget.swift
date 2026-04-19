@@ -91,8 +91,8 @@ struct Provider: AppIntentTimelineProvider {
             entries.append(PrayerEntry(date: entryDate, prayerTimes: prayerTimes, locationName: locationName))
         }
 
-        let nextHour = Calendar.current.date(byAdding: .hour, value: 1, to: currentDate)!
-        return Timeline(entries: entries, policy: .after(nextHour))
+        let nextRefresh = Calendar.current.date(byAdding: .minute, value: 10, to: currentDate)!
+        return Timeline(entries: entries, policy: .after(nextRefresh))
     }
 
     private func loadLocation() -> (latitude: Double, longitude: Double, cityName: String)? {
