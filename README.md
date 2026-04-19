@@ -134,3 +134,7 @@ This project is licensed under the [MIT License](LICENSE).
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Assets
+<a href="https://www.flaticon.com/free-icons/prayer" title="prayer icons">Prayer icons created by kerismaker - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/kaaba" title="kaaba icons">Kaaba icons created by Freepik - Flaticon</a>

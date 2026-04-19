@@ -48,15 +48,9 @@ struct AboutView: View {
                             )
 
                             DescriptionRow(
-                                icon: "lasso.badge.sparkles",
+                                icon: "sparkles",
                                 title: "Open Source",
                                 description: "This app is open source. Contributions and improvements are welcome."
-                            )
-                            
-                            DescriptionRow(
-                                icon: "photo",
-                                title: "Attribution",
-                                description: "icons created by Freepik - Flaticon"
                             )
                         }
                         .padding(.horizontal, 24)
