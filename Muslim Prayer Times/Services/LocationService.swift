@@ -35,11 +35,53 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var cityName: String = ""
     @Published var heading: Double = 0
+    @Published var isManualLocation: Bool = false
 
     override init() {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
+        loadManualLocation()
+    }
+
+    func setManualLocation(lat: Double, lon: Double, cityName name: String) {
+        let clLocation = CLLocation(latitude: lat, longitude: lon)
+        location = clLocation
+        cityName = name
+        isManualLocation = true
+        locationError = nil
+        saveLocationToAppGroup(lat: lat, lon: lon)
+        saveCityNameToAppGroup(name)
+        saveManualLocationToAppGroup(lat: lat, lon: lon, cityName: name)
+    }
+
+    private func saveManualLocationToAppGroup(lat: Double, lon: Double, cityName name: String) {
+        guard let defaults = UserDefaults(suiteName: appGroupID) else { return }
+        let manualData: [String: Any] = [
+            "latitude": lat,
+            "longitude": lon,
+            "cityName": name
+        ]
+        defaults.set(manualData, forKey: "manualLocation")
+    }
+
+    func useCurrentLocation() {
+        isManualLocation = false
+        if let defaults = UserDefaults(suiteName: appGroupID) {
+            defaults.removeObject(forKey: "manualLocation")
+        }
+        manager.requestLocation()
+    }
+
+    private func loadManualLocation() {
+        guard let defaults = UserDefaults(suiteName: appGroupID),
+              let manualData = defaults.dictionary(forKey: "manualLocation"),
+              let lat = manualData["latitude"] as? Double,
+              let lon = manualData["longitude"] as? Double,
+              let name = manualData["cityName"] as? String else { return }
+        location = CLLocation(latitude: lat, longitude: lon)
+        cityName = name
+        isManualLocation = true
     }
 
     func requestLocation() {
@@ -69,6 +111,7 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard !isManualLocation else { return }
         location = locations.first
         if let loc = locations.first {
             saveLocationToAppGroup(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude)
@@ -104,7 +147,7 @@ class LocationService: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     private func saveCityNameToAppGroup(_ cityName: String) {
         guard let defaults = UserDefaults(suiteName: appGroupID),
-              var locationData = defaults.dictionary(forKey: "userLocation") as? [String: Any] else { return }
+              var locationData = defaults.dictionary(forKey: "userLocation") else { return }
         locationData["cityName"] = cityName
         defaults.set(locationData, forKey: "userLocation")
     }

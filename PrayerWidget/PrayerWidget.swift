@@ -91,7 +91,7 @@ struct Provider: AppIntentTimelineProvider {
             entries.append(PrayerEntry(date: entryDate, prayerTimes: prayerTimes, locationName: locationName))
         }
 
-        let nextRefresh = Calendar.current.date(byAdding: .minute, value: 10, to: currentDate)!
+        let nextRefresh = Calendar.current.date(byAdding: .minute, value: 15, to: currentDate)!
         return Timeline(entries: entries, policy: .after(nextRefresh))
     }
 

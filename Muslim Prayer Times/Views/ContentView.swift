@@ -14,11 +14,12 @@ struct ContentView: View {
     var body: some View {
         Group {
             switch locationService.authorizationStatus {
-            case .notDetermined:
-                LocationPermissionView(locationService: locationService)
-
-            case .denied, .restricted:
-                LocationDeniedView()
+            case .denied, .restricted, .notDetermined:
+                if locationService.location != nil {
+                    MainTabView(locationService: locationService)
+                } else {
+                    LocationSearchView(locationService: locationService)
+                }
 
             case .authorizedWhenInUse, .authorizedAlways:
                 if locationService.location != nil {

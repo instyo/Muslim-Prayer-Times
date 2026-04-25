@@ -11,6 +11,7 @@ import CoreLocation
 struct PrayerView: View {
     @ObservedObject var locationService: LocationService
     @StateObject private var viewModel = PrayerViewModel()
+    @State private var showingLocationSearch = false
 
     var body: some View {
         NavigationStack {
@@ -22,13 +23,20 @@ struct PrayerView: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             HStack {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "location.fill")
-                                        .font(.caption)
-                                        .foregroundColor(Color("PrimaryGreen"))
-                                    Text(locationService.cityName)
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
+                                Button {
+                                    showingLocationSearch = true
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "location.fill")
+                                            .font(.caption)
+                                            .foregroundColor(Color("PrimaryGreen"))
+                                        Text(locationService.cityName)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                                 
                                 Spacer()
@@ -103,12 +111,35 @@ struct PrayerView: View {
             }
         }
         .onAppear {
-            if let loc = locationService.location {
+            if locationService.location != nil {
                 viewModel.startCountdownTimer()
             }
         }
         .onDisappear {
             viewModel.stopCountdownTimer()
+        }
+        .sheet(isPresented: $showingLocationSearch) {
+            LocationSearchView(locationService: locationService) {
+                showingLocationSearch = false
+                if let loc = locationService.location {
+                    Task {
+                        await viewModel.fetchPrayerTimes(
+                            latitude: loc.coordinate.latitude,
+                            longitude: loc.coordinate.longitude
+                        )
+                    }
+                }
+            }
+        }
+        .onChange(of: locationService.location) { _, newLocation in
+            if let loc = newLocation {
+                Task {
+                    await viewModel.fetchPrayerTimes(
+                        latitude: loc.coordinate.latitude,
+                        longitude: loc.coordinate.longitude
+                    )
+                }
+            }
         }
     }
 }
